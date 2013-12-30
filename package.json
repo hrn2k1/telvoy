@@ -1,0 +1,19 @@
+{
+  "name": "nslconf",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "mpns": "*",
+    "imap": "*",
+    "mailparser": "*",
+    "azure": "*",
+    "icalendar": "*",
+    "mimelib-noiconv": "*",
+    "querystring": "*",
+    "edge": "*",
+    "edge-sql": "*"
+  }
+}
