@@ -15,7 +15,7 @@ var tableQuery = azure.TableQuery
     .top(1)
 ;*/
 
-function fetchPushUrl() {
+function HandleEmails() {
     /*tableService.queryEntities(tableQuery, function (error, entities) {
         console.log(inspect(entities));
         if (error) {
@@ -34,17 +34,17 @@ var duration=config.PULL_EMAIL_DURATION;
 var NotificationRemainderDuration=config.NOTIFICATION_DURATION;
 
 //console.log(duration);
-fetchPushUrl();
+HandleEmails();
 setInterval(function() {
     console.log('Pull Invitation: '+new Date());
-    fetchPushUrl();
+    HandleEmails();
 }, duration);
 
 //console.log(NotificationRemainderDuration);
 function SendEligibleNotifications(){
- dao.insertNotification(NotificationRemainderDuration);
+ dao.PushNotification(NotificationRemainderDuration);
 }
-
+SendEligibleNotifications();
 setInterval(function(){
     console.log('Send Notification: '+new Date());
     SendEligibleNotifications();

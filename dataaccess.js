@@ -1,8 +1,11 @@
+var mpns = require('mpns');
 var azure=require("azure");
 var edge = require('edge');
 var config=require('./config.js');
 var utility=require('./utility.js');
-function insertUser(response,deviceID,userID,firstName,lastName,phoneNo,masterEmail,password,location)
+
+/// User Creation Method Exposed here
+function insertUser(response,userID,deviceID,firstName,lastName,phoneNo,masterEmail,password,location)
 {
 
 var insertUserinfo = edge.func('sql', function () {/*
@@ -20,11 +23,12 @@ var insertUserinfo = edge.func('sql', function () {/*
         LastName : lastName,
         PhoneNo : phoneNo,
         MasterEmail : masterEmail,
-        Password : password,
+        Password : '',
         Location : location
         
     };
-
+    console.log('User object to add');
+    console.log(entity);
    insertUserinfo(entity,function(error,result){
     if(error)
     {
@@ -45,6 +49,80 @@ var insertUserinfo = edge.func('sql', function () {/*
     
 }
 
+//// Add method to add User's Other Emails 
+function insertEmailAddress(response,userID,emailID)
+{
+    console.log('Adding Email Address');
+    var addEmail=edge.func('sql',function(){/*
+     INSERT INTO dbo.EmailAddresses(UserID,EmailAddress,isBlocked) VALUES(@UserID,@EmailAddress,0);
+    */});
+    var mail={UserID:userID,EmailAddress:emailID};
+    console.log(mail);
+    addEmail(mail,function(error,result){
+    if(error)
+    {
+        console.log("insertEmail() error: "+error);
+       response.setHeader("content-type", "text/plain");
+       response.write('Error : ' + error);
+       response.end();
+    }
+    else
+    {
+        console.log("EmailAddress inserted Successfully");
+         response.setHeader("content-type", "text/plain");
+         response.write('Success');
+         response.end();
+    }
+    });
+}
+function deleteEmailAddress(response,userID,emailID)
+{
+    var delEmail=edge.func('sql',function(){/*
+     DELETE FROM EmailAddresses WHERE UserID=@UserID AND EmailAddress=@EmailAddress;
+    */});
+    delEmail({UserID:userID,EmailAddress:emailID},function(error,result){
+    if(error)
+    {
+        console.log("deleteEmail() error: "+error);
+       response.setHeader("content-type", "text/plain");
+       response.write('Error : ' + error);
+       response.end();
+    }
+    else
+    {
+        console.log("EmailAddress deleted Successfully");
+         response.setHeader("content-type", "text/plain");
+         response.write('Success');
+         response.end();
+    }
+    });
+}
+
+/// User Call Log History
+function insertCallLog(response,userID,startTime,endTime,callNo)
+{
+    var addCallLog=edge.func('sql',function(){/*
+     INSERT INTO CallLog(TimeStamp,UserID,StartTime,EndTime,CallNo) VALUES(GETDATE(),@UserID,@StartTime,@EndTime,@CallNo);
+    */});
+    addCallLog({UserID:userID,StartTime:startTime,EndTime:endTime,CallNo:callNo},function(error,result){
+    if(error)
+    {
+        console.log("insertCallLog() error: "+error);
+       response.setHeader("content-type", "text/plain");
+       response.write('Error : ' + error);
+       response.end();
+    }
+    else
+    {
+        console.log("CallLog inserted Successfully");
+         response.setHeader("content-type", "text/plain");
+         response.write('Success');
+         response.end();
+    }
+    });
+}
+
+/// Not used now
 function insertPushURL(response,deviceID,userID,pushURL)
 {
 	var TABLE_NAME="PushURLs";	
@@ -87,10 +165,13 @@ tableService.createTableIfNotExists(TABLE_NAME, function(error) {
     return 'Success';
 }
 
+
+/// Method to Add an invitation to database after parsing invitation email
+
 function insertInvitationEntity(entity,addresses){
     var insertInvite = edge.func('sql', function () {/*
-    INSERT INTO Invitations(ToEmails,FromEmail,InvDate,InvTime,Subject,Toll,PIN,AccessCode,Password,DialInProvider,TimeStamp) 
-    VALUES(@ToEmails,@FromEmail,@InvDate,@InvTime,@Subject,@Toll,@PIN,@AccessCode,@Password,@DialInProvider,GETDATE());
+    INSERT INTO Invitations(ToEmails,FromEmail,InvDate,InvTime,Subject,Toll,PIN,AccessCode,Password,DialInProvider,TimeStamp,Agenda) 
+    VALUES(@ToEmails,@FromEmail,@InvDate,@InvTime,@Subject,@Toll,@PIN,@AccessCode,@Password,@DialInProvider,GETDATE(),@Agenda);
 
 */});
 
@@ -149,28 +230,40 @@ else
 
 }
 
-function insertNotification(notificationRemainderTime)
+/// Method to send/push notification to MPNS
+function PushNotification(notificationRemainderTime)
 {
-    var insertNotif=edge.func('sql',function(){/*
-        INSERT INTO telvoy.notifications (text,InvID,InvEmails,complete)
-        select Subject+ ' at '+CAST(InvTime AS VARCHAR),i.ID,i.ToEmails,0 from invitations i LEFT JOIN telvoy.notifications n ON i.ID=n.InvID
-        where n.InvID IS NULL AND datediff(minute,GETDATE(),InvTime) between  -66666 and  @NotifTime
+    var getNotif=edge.func('sql',function(){/*
+       SELECT [Subject],Agenda,UserID,EmailID,Handle AS PushURL
+        FROM [dbo].[Invitations] i INNER JOIN dbo.Invitees a ON i.ID=a.InvID
+        INNER JOIN telvoy.Registrations r ON 1=1  WHERE datediff(minute,GETDATE(),InvTime) between  0 and  @NotifTime
     */})
 
-insertNotif({NotifTime:notificationRemainderTime},function(error,result){
+getNotif({NotifTime:notificationRemainderTime},function(error,result){
 if(error)
 {
-    console.log("insertNotification() error: "+error);
+    console.log("PushNotification() error: "+error);
     return "Error: "+error;
 }
 else
 {
-    return "Success";
+    console.log("Total Eligible getNotifications: "+result.length);
+    for(var i=0;i<result.length;i++){
+
+        var tileObj={
+            'title': result[i].Subject,
+            'backTitle': "Next Conference",
+            'backBackgroundImage': "/Assets/Tiles/BackTileBackground.png",
+            'backContent': result[i].Agenda,
+        };
+        mpns.sendTile(result[i].PushURL,tileObj,function(){console.log('Pushed OK');});
+    }
 }
 });
 
 }
 
+/// method to get latest invitation from Mobile set
 function getInvitations(response,userID,id)
 {
     if(userID==null) userID='jari.ala-ruona@movial.com';
@@ -201,6 +294,7 @@ else
 });
 }
 
+//// Not used now.
  function getNotifications(response)
 {
     //console.log(new Date(Date.parse('2013-12-12T06:13:16.189Z')));
@@ -235,13 +329,16 @@ else
 });
     
 }
-   
+
+/// Exposes all methods to call outsite this file, using its object   
 exports.insertUser=insertUser;
+exports.insertEmailAddress=insertEmailAddress;
+exports.deleteEmailAddress=deleteEmailAddress;
+exports.insertCallLog=insertCallLog;
 exports.insertPushURL=insertPushURL;
-//exports.insertInvitation=insertInvitation;
 exports.insertInvitationEntity=insertInvitationEntity;
 exports.getInvitations=getInvitations;
-exports.insertNotification=insertNotification
+exports.PushNotification=PushNotification
 exports.getNotifications=getNotifications;
 
 

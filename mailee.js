@@ -79,8 +79,8 @@ http.createServer(function(request, response) {
         var query = url.parse(request.url).query;
         var user=querystring.parse(query);
         //var u=utility.Nullify(user['u']);
-        //console.log(u);
-        dao.insertUser(response,utility.Nullify(user['deviceID']),utility.Nullify(user['userID']),utility.Nullify(user['firstName']),utility.Nullify(user['lastName']),utility.Nullify(user['phoneNo']),utility.Nullify(user['masterEmail']),utility.Nullify(user['password']),utility.Nullify(user['location']) );
+        //console.log(user);
+        dao.insertUser(response,utility.Nullify(user['userID']),utility.Nullify(user['deviceID']),utility.Nullify(user['firstName']),utility.Nullify(user['lastName']),utility.Nullify(user['phoneNo']),utility.Nullify(user['masterEmail']),utility.Nullify(user['password']),utility.Nullify(user['location']) );
         
     }
     else if (uri === "/pushurl") {
@@ -91,12 +91,36 @@ http.createServer(function(request, response) {
         dao.insertPushURL(response,utility.Nullify(user['deviceID']),utility.Nullify(user['userID']),utility.Nullify(user['pushURL']));
         
     }
+    else if (uri === "/addemail") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        console.log(user);
+        dao.insertEmailAddress(response,utility.Nullify(user['userID']),utility.Nullify(user['emailID']));
+        
+    }
+    else if (uri === "/removeemail") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        //console.log(u);
+        dao.deleteEmailAddress(response,utility.Nullify(user['userID']),utility.Nullify(user['emailID']));
+        
+    }
+    else if (uri === "/addcalllog") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        //console.log(u);
+        dao.insertCallLog(response,utility.Nullify(user['userID']),new Date(Date.parse(utility.isNull(user['startTime'],''))),new Date(Date.parse(utility.isNull(user['endTime'],''))),utility.Nullify(user['callNo']));
+        
+    }
     else {
         response.setHeader("content-type", "text/plain");
         response.write(JSON.stringify(url.parse(request.url)));
         response.end();
     }
-}).listen(process.env.port || 8282);
+}).listen(process.env.port || 8080);
 
 
 function checkConfMe(uri) {
@@ -130,7 +154,7 @@ function checkMails() {
             }
 
             imap.search([ 'FLAGGED', ['SINCE', 'June 01, 2013'] ], function(err, results) {
-                //console.log('err:'+err+' results:'+inspect(results, false, Infinity));
+                console.log('err:'+inspect(err, false, Infinity)+' results:'+inspect(results, false, Infinity));
                 
                 if (err) {
                     PARSE_RES['fetchMessage'] = 'Cannot search inbox: ' + err;
@@ -213,7 +237,8 @@ function fetchMailProcess(fetch) {
                 PIN: utility.isNull(out['pin'],''),
                 AccessCode: utility.isNull(out['code'],''),
                 Password: utility.isNull(out['password'],''),
-                DialInProvider:'WebEx'
+                DialInProvider:'WebEx',
+                Agenda:utility.isNull(out['agenda'],'')
                 };
         console.log("db entity to insert");
         console.log(entity);
@@ -462,7 +487,13 @@ function parseString(str, delimiter, endMarker, allowFuzzy, usePattern)
         },
         {
             keyword: 'subject',
-            alts: 'subject|topic',
+            alts: 'subject',
+            pattern: '.+',
+            fuzzy: false,
+        },
+        {
+            keyword: 'agenda',
+            alts: 'topic|agenda',
             pattern: '.+',
             fuzzy: false,
         },
