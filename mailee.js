@@ -115,6 +115,15 @@ http.createServer(function(request, response) {
         dao.insertCallLog(response,utility.Nullify(user['userID']),new Date(Date.parse(utility.isNull(user['startTime'],''))),new Date(Date.parse(utility.isNull(user['endTime'],''))),utility.Nullify(user['callNo']));
         
     }
+    else if (uri === "/toll") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        //console.log(u);
+
+        dao.getTollNo(response,utility.isNull(user['area'],''),utility.isNull(user['dialInProvider'],'WebEx'));
+        
+    }
     else {
         response.setHeader("content-type", "text/plain");
         response.write(JSON.stringify(url.parse(request.url)));

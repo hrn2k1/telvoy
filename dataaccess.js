@@ -121,7 +121,33 @@ function insertCallLog(response,userID,startTime,endTime,callNo)
     }
     });
 }
-
+/// Mapping Dial In 
+function getTollNo(response,area,dialInProvider)
+{
+ var getToll = edge.func('sql', function () {/*
+    SELECT * FROM DialInNumbers WHERE Area=@Area AND Provider=@Provider;
+*/});
+ 
+ getToll({Area:area,Provider:dialInProvider},function(error,result){
+if(error)
+{
+    console.log("GetDialToll() error: "+error);
+  
+    var invites = {"Error":error};
+          response.setHeader("content-type", "text/plain");
+         response.write(JSON.stringify(invites));
+        response.end();
+}
+else
+{
+        console.log(result);
+        //return JSON.stringify(result);
+        response.setHeader("content-type", "text/plain");
+         response.write("{\"Tolls\":"+JSON.stringify(result)+"}");
+        response.end();
+}
+});
+}
 /// Not used now
 function insertPushURL(response,deviceID,userID,pushURL)
 {
@@ -340,5 +366,6 @@ exports.insertInvitationEntity=insertInvitationEntity;
 exports.getInvitations=getInvitations;
 exports.PushNotification=PushNotification
 exports.getNotifications=getNotifications;
+exports.getTollNo=getTollNo;
 
 
