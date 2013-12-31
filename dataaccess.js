@@ -195,7 +195,7 @@ else
         console.log(result);
         //return JSON.stringify(result);
         response.setHeader("content-type", "text/plain");
-         response.write("{invitations:"+JSON.stringify(result)+"}");
+         response.write("{\"invitations\":"+JSON.stringify(result)+"}");
         response.end();
 }
 });
