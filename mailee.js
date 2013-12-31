@@ -96,7 +96,7 @@ http.createServer(function(request, response) {
         response.write(JSON.stringify(url.parse(request.url)));
         response.end();
     }
-}).listen(process.env.port || 8080);
+}).listen(process.env.port || 8282);
 
 
 function checkConfMe(uri) {
