@@ -107,6 +107,22 @@ http.createServer(function(request, response) {
         dao.deleteEmailAddress(response,utility.Nullify(user['userID']),utility.Nullify(user['emailID']));
         
     }
+    else if (uri === "/editemail") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        //console.log(u);
+        dao.updateEmailAddress(response,utility.Nullify(user['userID']),utility.Nullify(user['oldEmailID']),utility.Nullify(user['newEmailID']));
+        
+    }
+    else if (uri === "/getemail") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        //console.log(u);
+        dao.getEmailAddresses(response,utility.Nullify(user['userID']));
+        
+    }
     else if (uri === "/addcalllog") {
         var query = url.parse(request.url).query;
         var user=querystring.parse(query);
@@ -122,6 +138,15 @@ http.createServer(function(request, response) {
         //console.log(u);
 
         dao.getTollNo(response,utility.isNull(user['area'],''),utility.isNull(user['dialInProvider'],'WebEx'));
+        
+    }
+    else if (uri === "/credit") {
+        var query = url.parse(request.url).query;
+        var user=querystring.parse(query);
+        //var u=utility.Nullify(user['u']);
+        //console.log(u);
+
+        dao.getCreditBalance(response,utility.Nullify(user['userID']));
         
     }
     else {

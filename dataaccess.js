@@ -97,6 +97,51 @@ function deleteEmailAddress(response,userID,emailID)
     }
     });
 }
+function updateEmailAddress(response,userID,oldEmailID,newEmailID)
+{
+    var editEmail=edge.func('sql',function(){/*
+     UPDATE EmailAddresses SET EmailAddress=@NewEmailID  WHERE UserID=@UserID AND EmailAddress=@OldEmailID;
+    */});
+    editEmail({UserID:userID,OldEmailID:oldEmailID,NewEmailID:newEmailID},function(error,result){
+    if(error)
+    {
+        console.log("updateEmail() error: "+error);
+       response.setHeader("content-type", "text/plain");
+       response.write('Error : ' + error);
+       response.end();
+    }
+    else
+    {
+        console.log("EmailAddress updated Successfully");
+         response.setHeader("content-type", "text/plain");
+         response.write('Success');
+         response.end();
+    }
+    });
+}
+
+function getEmailAddresses(response,userID)
+{
+    var getEmail=edge.func('sql',function(){/*
+     SELECT * FROM  EmailAddresses WHERE UserID=@UserID;
+    */});
+    getEmail({UserID:userID},function(error,result){
+    if(error)
+    {
+        console.log("updateEmail() error: "+error);
+       response.setHeader("content-type", "text/plain");
+       response.write('Error : ' + error);
+       response.end();
+    }
+    else
+    {
+        console.log("EmailAddress updated Successfully");
+         response.setHeader("content-type", "text/plain");
+         response.write("{\"Emails\":"+JSON.stringify(result)+"}");
+         response.end();
+    }
+    });
+}
 
 /// User Call Log History
 function insertCallLog(response,userID,startTime,endTime,callNo)
@@ -355,7 +400,12 @@ else
 });
     
 }
-
+////
+function getCreditBalance(response,userID){
+    response.setHeader("content-type", "text/plain");
+    response.write("{Credit:10}");
+    response.end();
+}
 /// Exposes all methods to call outsite this file, using its object   
 exports.insertUser=insertUser;
 exports.insertEmailAddress=insertEmailAddress;
@@ -367,5 +417,8 @@ exports.getInvitations=getInvitations;
 exports.PushNotification=PushNotification
 exports.getNotifications=getNotifications;
 exports.getTollNo=getTollNo;
+exports.updateEmailAddress=updateEmailAddress;
+exports.getEmailAddresses=getEmailAddresses;
+exports.getCreditBalance=getCreditBalance;
 
 
