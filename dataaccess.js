@@ -9,13 +9,16 @@ function insertUser(response,userID,deviceID,firstName,lastName,phoneNo,masterEm
 {
 
 var insertUserinfo = edge.func('sql', function () {/*
-    INSERT INTO dbo.Users(UserID,DeviceID,FirstName,LastName,PhoneNo,MasterEmail,Password,Location,RegistrationTime,IsBlackListed)
-    VALUES(@UserID,@DeviceID,@FirstName,@LastName,@PhoneNo,@MasterEmail,@Password,@Location,GETDATE(),0)
-
+INSERT INTO dbo.Users(UserID,DeviceID,FirstName,LastName,PhoneNo,MasterEmail,Password,Location,RegistrationTime,IsBlackListed)
+VALUES(@UserID,@DeviceID,@FirstName,@LastName,@PhoneNo,@MasterEmail,@Password,@Location,GETDATE(),0);
 */});
+ var getUser=edge.func('sql',function(){/*
+    SELECT * FROM dbo.Users WHERE UserID=@UserID;
+ */});
 
-
-
+var updateUser=edge.func('sql',function(){/*
+UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,PhoneNo=@PhoneNo,MasterEmail=@MasterEmail,Password=@Password,Location=@Location WHERE UserID=@UserID;
+*/});
   var entity = {
         UserID : userID,
         DeviceID: deviceID,
@@ -29,22 +32,57 @@ var insertUserinfo = edge.func('sql', function () {/*
     };
     console.log('User object to add');
     console.log(entity);
-   insertUserinfo(entity,function(error,result){
-    if(error)
-    {
-        console.log("insertUser() error: "+error);
+    getUser({UserID:userID},function(error,result){
+        if(error)
+        {
+        console.log("getUser() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('Error : ' + error);
+       response.write('\"Status\":\"Unsuccess"}');
        response.end();
-    }
-    else
-    {
-        console.log("Invitation inserted Successfully");
-         response.setHeader("content-type", "text/plain");
-         response.write('Success');
-         response.end();
-    }
-});
+        }
+        else
+        {
+            if(result.length==0)
+            {
+                insertUserinfo(entity,function(error,result){
+                    if(error)
+                    {
+                        console.log("insertUser() error: "+error);
+                       response.setHeader("content-type", "text/plain");
+                       response.write('\"Status\":\"Unsuccess"}');
+                       response.end();
+                    }
+                    else
+                    {
+                        console.log("Invitation inserted Successfully");
+                         response.setHeader("content-type", "text/plain");
+                         response.write('\"Status\":\"Success"}');
+                         response.end();
+                    }
+                });
+            }
+            else
+            {
+                updateUser(entity,function(error,result){
+                    if(error)
+                    {
+                        console.log("insertUser() error: "+error);
+                       response.setHeader("content-type", "text/plain");
+                       response.write('\"Status\":\"Unsuccess"}');
+                       response.end();
+                    }
+                    else
+                    {
+                        console.log("Invitation inserted Successfully");
+                         response.setHeader("content-type", "text/plain");
+                         response.write('\"Status\":\"Success"}');
+                         response.end();
+                    }
+                });
+            }
+        }
+    });
+   
    
     
 }
@@ -63,14 +101,14 @@ function insertEmailAddress(response,userID,emailID)
     {
         console.log("insertEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('Error : ' + error);
+      response.write('\"Status\":\"Unsuccess"}');
        response.end();
     }
     else
     {
         console.log("EmailAddress inserted Successfully");
          response.setHeader("content-type", "text/plain");
-         response.write('Success');
+         response.write('\"Status\":\"Success"}');
          response.end();
     }
     });
@@ -85,14 +123,14 @@ function deleteEmailAddress(response,userID,emailID)
     {
         console.log("deleteEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('Error : ' + error);
+        response.write('\"Status\":\"Unsuccess"}');
        response.end();
     }
     else
     {
         console.log("EmailAddress deleted Successfully");
          response.setHeader("content-type", "text/plain");
-         response.write('Success');
+          response.write('\"Status\":\"Success"}');
          response.end();
     }
     });
@@ -107,14 +145,14 @@ function updateEmailAddress(response,userID,oldEmailID,newEmailID)
     {
         console.log("updateEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('Error : ' + error);
+        response.write('\"Status\":\"Unsuccess"}');
        response.end();
     }
     else
     {
         console.log("EmailAddress updated Successfully");
          response.setHeader("content-type", "text/plain");
-         response.write('Success');
+          response.write('\"Status\":\"Success"}');
          response.end();
     }
     });
@@ -130,7 +168,7 @@ function getEmailAddresses(response,userID)
     {
         console.log("updateEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('Error : ' + error);
+        response.write('\"Status\":\"UnSuccess"}');
        response.end();
     }
     else
@@ -154,14 +192,14 @@ function insertCallLog(response,userID,startTime,endTime,callNo)
     {
         console.log("insertCallLog() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('Error : ' + error);
+       response.write('\"Status\":\"Unsuccess"}');
        response.end();
     }
     else
     {
         console.log("CallLog inserted Successfully");
          response.setHeader("content-type", "text/plain");
-         response.write('Success');
+         response.write('\"Status\":\"Success"}');
          response.end();
     }
     });
@@ -178,7 +216,7 @@ if(error)
 {
     console.log("GetDialToll() error: "+error);
   
-    var invites = {"Error":error};
+    var invites = {"Status":"Unsuccess"};
           response.setHeader("content-type", "text/plain");
          response.write(JSON.stringify(invites));
         response.end();
