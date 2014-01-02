@@ -37,7 +37,7 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
         {
         console.log("getUser() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('\"Status\":\"Unsuccess"}');
+       response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
         }
         else
@@ -49,14 +49,14 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
                     {
                         console.log("insertUser() error: "+error);
                        response.setHeader("content-type", "text/plain");
-                       response.write('\"Status\":\"Unsuccess"}');
+                       response.write('{\"Status\":\"Unsuccess\"}');
                        response.end();
                     }
                     else
                     {
                         console.log("Invitation inserted Successfully");
                          response.setHeader("content-type", "text/plain");
-                         response.write('\"Status\":\"Success"}');
+                         response.write('{\"Status\":\"Success\"}');
                          response.end();
                     }
                 });
@@ -68,14 +68,14 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
                     {
                         console.log("insertUser() error: "+error);
                        response.setHeader("content-type", "text/plain");
-                       response.write('\"Status\":\"Unsuccess"}');
+                       response.write('{\"Status\":\"Unsuccess\"}');
                        response.end();
                     }
                     else
                     {
                         console.log("Invitation inserted Successfully");
                          response.setHeader("content-type", "text/plain");
-                         response.write('\"Status\":\"Success"}');
+                         response.write('{\"Status\":\"Success\"}');
                          response.end();
                     }
                 });
@@ -101,14 +101,14 @@ function insertEmailAddress(response,userID,emailID)
     {
         console.log("insertEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-      response.write('\"Status\":\"Unsuccess"}');
+      response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
         console.log("EmailAddress inserted Successfully");
          response.setHeader("content-type", "text/plain");
-         response.write('\"Status\":\"Success"}');
+         response.write('{\"Status\":\"Success\"}');
          response.end();
     }
     });
@@ -123,14 +123,14 @@ function deleteEmailAddress(response,userID,emailID)
     {
         console.log("deleteEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-        response.write('\"Status\":\"Unsuccess"}');
+        response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
         console.log("EmailAddress deleted Successfully");
          response.setHeader("content-type", "text/plain");
-          response.write('\"Status\":\"Success"}');
+          response.write('{\"Status\":\"Success\"}');
          response.end();
     }
     });
@@ -145,14 +145,14 @@ function updateEmailAddress(response,userID,oldEmailID,newEmailID)
     {
         console.log("updateEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-        response.write('\"Status\":\"Unsuccess"}');
+        response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
         console.log("EmailAddress updated Successfully");
          response.setHeader("content-type", "text/plain");
-          response.write('\"Status\":\"Success"}');
+          response.write('{\"Status\":\"Success\"}');
          response.end();
     }
     });
@@ -168,7 +168,7 @@ function getEmailAddresses(response,userID)
     {
         console.log("updateEmail() error: "+error);
        response.setHeader("content-type", "text/plain");
-        response.write('\"Status\":\"UnSuccess"}');
+        response.write('{\"Status\":\"UnSuccess\"}');
        response.end();
     }
     else
@@ -192,14 +192,14 @@ function insertCallLog(response,userID,startTime,endTime,callNo)
     {
         console.log("insertCallLog() error: "+error);
        response.setHeader("content-type", "text/plain");
-       response.write('\"Status\":\"Unsuccess"}');
+       response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
         console.log("CallLog inserted Successfully");
          response.setHeader("content-type", "text/plain");
-         response.write('\"Status\":\"Success"}');
+         response.write('{\"Status\":\"Success\"}');
          response.end();
     }
     });
@@ -387,7 +387,7 @@ if(error)
 {
     console.log("GetInvitation() error: "+error);
   
-    var invites = {"Error":error};
+    var invites = {"Status":"Unsuccess"};
           response.setHeader("content-type", "text/plain");
          response.write(JSON.stringify(invites));
         response.end();
