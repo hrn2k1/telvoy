@@ -160,6 +160,17 @@ http.createServer(function(request, response) {
        }
    });
     }
+    else if(RightString(url,3)=="txt"){
+         fs.readFile("../../LogFiles/Application"+url ,function(error,data){
+       if(error){
+           response.writeHead(404,{"Content-type":"text/plain"});
+           response.end("Sorry the page was not found"+error);
+       }else{
+           response.writeHead(202,{"Content-type":"text/html"});
+           response.end(data);
+
+       }
+    }
     else {
         response.setHeader("content-type", "text/plain");
         response.write(JSON.stringify(url.parse(request.url)));
@@ -167,7 +178,16 @@ http.createServer(function(request, response) {
     }
 }).listen(process.env.port || 8080);
 
-
+function RightString(str, n){
+        if (n <= 0)
+        return "";
+        else if (n > String(str).length)
+        return str;
+        else {
+        var intLen = String(str).length;
+        return String(str).substring(intLen, intLen - n);
+            }
+}
 function checkConfMe() {
    
     checkMails();
