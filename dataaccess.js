@@ -441,7 +441,7 @@ else
 ////
 function getCreditBalance(response,userID){
     response.setHeader("content-type", "text/plain");
-    response.write("{Credit:10}");
+    response.write("{\"Credit\":10}");
     response.end();
 }
 /// Exposes all methods to call outsite this file, using its object   
