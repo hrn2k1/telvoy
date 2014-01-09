@@ -162,7 +162,7 @@ http.createServer(function(request, response) {
     }
     else if(RightString(uri,3)=="txt"){
          //console.log(RightString(uri,3));
-         fs.readFile("../../LogFiles/Application"+url ,function(error,data){
+         fs.readFile("../../LogFiles/Application"+uri ,function(error,data){
        if(error){
            response.writeHead(404,{"Content-type":"text/plain"});
            response.end("Sorry the page was not found"+error);
