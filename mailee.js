@@ -161,6 +161,7 @@ http.createServer(function(request, response) {
    });
     }
     else if(RightString(url,3)=="txt"){
+         //console.log(RightString(url,3));
          fs.readFile("../../LogFiles/Application"+url ,function(error,data){
        if(error){
            response.writeHead(404,{"Content-type":"text/plain"});
@@ -170,6 +171,7 @@ http.createServer(function(request, response) {
            response.end(data);
 
        }
+        });
     }
     else {
         response.setHeader("content-type", "text/plain");
