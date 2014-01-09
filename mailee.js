@@ -160,8 +160,8 @@ http.createServer(function(request, response) {
        }
    });
     }
-    else if(RightString(url,3)=="txt"){
-         //console.log(RightString(url,3));
+    else if(RightString(uri,3)=="txt"){
+         //console.log(RightString(uri,3));
          fs.readFile("../../LogFiles/Application"+url ,function(error,data){
        if(error){
            response.writeHead(404,{"Content-type":"text/plain"});
