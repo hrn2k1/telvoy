@@ -167,7 +167,7 @@ http.createServer(function(request, response) {
            response.writeHead(404,{"Content-type":"text/plain"});
            response.end("Sorry the page was not found"+error);
        }else{
-           response.writeHead(202,{"Content-type":"text/html"});
+           response.writeHead(202,{"Content-type":"text/plain"});
            response.end(data);
 
        }
