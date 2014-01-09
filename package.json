@@ -14,6 +14,7 @@
     "mimelib-noiconv": "*",
     "querystring": "*",
     "edge": "*",
-    "edge-sql": "*"
+    "edge-sql": "*",
+    "nodemailer": "0.5.14"
   }
 }

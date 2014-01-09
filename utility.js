@@ -37,7 +37,18 @@ return dt;
     return (S4() + S4() + delim + S4() + delim + S4() + delim + S4() + delim + S4() + S4() + S4());
 };
 
+function log(msg,type){
+if(type==null || type=='undefined' )
+    type='NORMAL';
+var dt=new Date();
+if(typeof(msg)=='object')
+    msg=JSON.stringify(msg);
+console.log(dt.toISOString()+'>> '+ type+': '+msg);
+
+}
+
 exports.Nullify=Nullify;
 exports.isNull=isNull;
 exports.generateUid=generateUid;
 exports.convertToDateTime=convertToDateTime;
+exports.log=log;

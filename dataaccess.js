@@ -30,12 +30,12 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
         Location : location
         
     };
-    console.log('User object to add');
-    console.log(entity);
+    utility.log('User object to add');
+    utility.log(entity);
     getUser({UserID:userID},function(error,result){
         if(error)
         {
-        console.log("getUser() error: "+error);
+        utility.log("getUser() error: "+error,'ERROR');
        response.setHeader("content-type", "text/plain");
        response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
@@ -47,14 +47,14 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
                 insertUserinfo(entity,function(error,result){
                     if(error)
                     {
-                        console.log("insertUser() error: "+error);
+                        utility.log("insertUser() error: "+error,'ERROR');
                        response.setHeader("content-type", "text/plain");
                        response.write('{\"Status\":\"Unsuccess\"}');
                        response.end();
                     }
                     else
                     {
-                        console.log("Invitation inserted Successfully");
+                        utility.log("Invitation inserted Successfully");
                          response.setHeader("content-type", "text/plain");
                          response.write('{\"Status\":\"Success\"}');
                          response.end();
@@ -66,14 +66,14 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
                 updateUser(entity,function(error,result){
                     if(error)
                     {
-                        console.log("insertUser() error: "+error);
+                        utility.log("insertUser() error: "+error,'ERROR');
                        response.setHeader("content-type", "text/plain");
                        response.write('{\"Status\":\"Unsuccess\"}');
                        response.end();
                     }
                     else
                     {
-                        console.log("Invitation inserted Successfully");
+                        utility.log("Invitation inserted Successfully");
                          response.setHeader("content-type", "text/plain");
                          response.write('{\"Status\":\"Success\"}');
                          response.end();
@@ -90,23 +90,23 @@ UPDATE dbo.Users SET DeviceID=@DeviceID,FirstName=@FirstName,LastName=@LastName,
 //// Add method to add User's Other Emails 
 function insertEmailAddress(response,userID,emailID)
 {
-    console.log('Adding Email Address');
+    utility.log('Adding Email Address');
     var addEmail=edge.func('sql',function(){/*
      INSERT INTO dbo.EmailAddresses(UserID,EmailAddress,isBlocked) VALUES(@UserID,@EmailAddress,0);
     */});
     var mail={UserID:userID,EmailAddress:emailID};
-    console.log(mail);
+    utility.log(mail);
     addEmail(mail,function(error,result){
     if(error)
     {
-        console.log("insertEmail() error: "+error);
+        utility.log("insertEmail() error: "+error,'ERROR');
        response.setHeader("content-type", "text/plain");
       response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
-        console.log("EmailAddress inserted Successfully");
+        utility.log("EmailAddress inserted Successfully");
          response.setHeader("content-type", "text/plain");
          response.write('{\"Status\":\"Success\"}');
          response.end();
@@ -121,14 +121,14 @@ function deleteEmailAddress(response,userID,emailID)
     delEmail({UserID:userID,EmailAddress:emailID},function(error,result){
     if(error)
     {
-        console.log("deleteEmail() error: "+error);
+        utility.log("deleteEmail() error: "+error,'ERROR');
        response.setHeader("content-type", "text/plain");
         response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
-        console.log("EmailAddress deleted Successfully");
+        utility.log("EmailAddress deleted Successfully");
          response.setHeader("content-type", "text/plain");
           response.write('{\"Status\":\"Success\"}');
          response.end();
@@ -143,14 +143,14 @@ function updateEmailAddress(response,userID,oldEmailID,newEmailID)
     editEmail({UserID:userID,OldEmailID:oldEmailID,NewEmailID:newEmailID},function(error,result){
     if(error)
     {
-        console.log("updateEmail() error: "+error);
+        utility.log("updateEmail() error: "+error,'ERROR');
        response.setHeader("content-type", "text/plain");
         response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
-        console.log("EmailAddress updated Successfully");
+        utility.log("EmailAddress updated Successfully");
          response.setHeader("content-type", "text/plain");
           response.write('{\"Status\":\"Success\"}');
          response.end();
@@ -166,14 +166,14 @@ function getEmailAddresses(response,userID)
     getEmail({UserID:userID},function(error,result){
     if(error)
     {
-        console.log("updateEmail() error: "+error);
+        utility.log("updateEmail() error: "+error,'ERROR');
        response.setHeader("content-type", "text/plain");
         response.write('{\"Status\":\"UnSuccess\"}');
        response.end();
     }
     else
     {
-        console.log("EmailAddress updated Successfully");
+        utility.log("EmailAddress updated Successfully");
          response.setHeader("content-type", "text/plain");
          response.write("{\"Emails\":"+JSON.stringify(result)+"}");
          response.end();
@@ -190,14 +190,14 @@ function insertCallLog(response,userID,startTime,endTime,callNo)
     addCallLog({UserID:userID,StartTime:startTime,EndTime:endTime,CallNo:callNo},function(error,result){
     if(error)
     {
-        console.log("insertCallLog() error: "+error);
+        utility.log("insertCallLog() error: "+error,'ERROR');
        response.setHeader("content-type", "text/plain");
        response.write('{\"Status\":\"Unsuccess\"}');
        response.end();
     }
     else
     {
-        console.log("CallLog inserted Successfully");
+        utility.log("CallLog inserted Successfully");
          response.setHeader("content-type", "text/plain");
          response.write('{\"Status\":\"Success\"}');
          response.end();
@@ -214,7 +214,7 @@ function getTollNo(response,area,dialInProvider)
  getToll({Area:area,Provider:dialInProvider},function(error,result){
 if(error)
 {
-    console.log("GetDialToll() error: "+error);
+    utility.log("GetDialToll() error: "+error,'ERROR');
   
     var invites = {"Status":"Unsuccess"};
           response.setHeader("content-type", "text/plain");
@@ -223,7 +223,7 @@ if(error)
 }
 else
 {
-        console.log(result);
+        utility.log(result);
         //return JSON.stringify(result);
         response.setHeader("content-type", "text/plain");
          response.write("{\"Tolls\":"+JSON.stringify(result)+"}");
@@ -238,7 +238,7 @@ function insertPushURL(response,deviceID,userID,pushURL)
 var tableService = azure.createTableService(config.STORAGE_ACCOUNT_NAME, config.STORAGE_ACCOUNT_KEY);
 tableService.createTableIfNotExists(TABLE_NAME, function(error) {
         if (error) {
-            console.error('insertPushURL() error: ' + error);
+            utility.log('insertPushURL() error: ' + error,'ERROR');
             //request.respond(statusCodes.BAD_REQUEST, error);
             
             response.setHeader("content-type", "text/plain");
@@ -279,8 +279,8 @@ tableService.createTableIfNotExists(TABLE_NAME, function(error) {
 
 function insertInvitationEntity(entity,addresses){
     var insertInvite = edge.func('sql', function () {/*
-    INSERT INTO Invitations(ToEmails,FromEmail,InvDate,InvTime,Subject,Toll,PIN,AccessCode,Password,DialInProvider,TimeStamp,Agenda) 
-    VALUES(@ToEmails,@FromEmail,@InvDate,@InvTime,@Subject,@Toll,@PIN,@AccessCode,@Password,@DialInProvider,GETDATE(),@Agenda);
+    INSERT INTO Invitations(ToEmails,FromEmail,InvDate,InvTime,Subject,Toll,PIN,AccessCode,Password,DialInProvider,TimeStamp,Agenda,MessageID) 
+    VALUES(@ToEmails,@FromEmail,@InvDate,@InvTime,@Subject,@Toll,@PIN,@AccessCode,@Password,@DialInProvider,GETDATE(),@Agenda,@MessageID);
 
 */});
 
@@ -292,45 +292,76 @@ var insertInvitee = edge.func('sql', function () {/*
     INSERT INTO Invitees(UserID,EmailID,InvID) VALUES(@UserID,@EmailID,@InvID);
 
 */});
+
+var getUserIDByEmail=edge.func('sql',function(){/*
+SELECT u.UserID,a.Emailaddress FROM users u LEFT JOIN emailaddresses a ON u.UserID=a.UserID
+WHERE  u.UserID=RTRIM(LTRIM(@Email)) OR a.emailaddress=RTRIM(LTRIM(@Email))
+*/});
+
 insertInvite(entity,function(error,result){
 if(error)
 {
-    console.log("insertInvitation() error: "+error);
+    utility.log("insertInvitation() error: "+error,'ERROR');
    throw error;
 }
 else
 {
-    console.log("Invitation inserted Successfully");
+    utility.log("Invitation inserted Successfully");
     getMaxInvID(null,function(error,result){
     if(error)
     {
-        console.log("insertInvitation() error: "+error);
+        utility.log("insertInvitation() error: "+error,'ERROR');
         throw error;
     }
     else
     {
 
         var MxInvID=result[0].MXID;
-        console.log("Max Invitation ID  retrieved Successfully, ID: "+MxInvID);
+        utility.log("Max Invitation ID  retrieved Successfully, ID: "+MxInvID);
         for (var i =0; i<addresses.length; i++) {
                
-             attendee={UserID:addresses[i].address,EmailID:addresses[i].address,InvID:MxInvID};
-
-             insertInvitee(attendee,function(error,result){
+            var emailID=addresses[i].address;
+            getUserIDByEmail({Email:emailID},function(error,result){
             if(error)
             {
-                console.log("insertInvitee() error: "+error);
+                utility.log("getUserIDByEmail() error: "+error,'ERROR');
                 return -1;
             }
             else
             {
-                console.log("Invitee inserted Successfully");
-                return result;;
+              //console.log('loggggggggggg '+result.length);
+              if(result.length==0)
+              {
+
+                utility.log(emailID+' not found in white list');
+                //send email
+                var mailer= require('./mailsender.js');
+                mailer.sendMail(config.NOT_WHITELISTED_EMAIL_SUBJECT,config.NOT_WHITELISTED_EMAIL_BODY,emailID);
+              }
+              else
+              {
+                utility.log('UserID '+result[0].UserID+' found for '+emailID);
+                  attendee={UserID:result[0].UserID,EmailID:emailID,InvID:MxInvID};
+
+                  insertInvitee(attendee,function(error,result){
+                  if(error)
+                  {
+                      utility.log("insertInvitee() error: "+error,'ERROR');
+                      return -1;
+                  }
+                  else
+                  {
+                      utility.log("Invitee inserted Successfully");
+                      return result;;
+                  }
+                  });
+               }
             }
-            });
+               });
+            
 
         }
-        console.log('End Invitation Save into sql database');
+        utility.log('End Invitation Save into sql database');
 
     }
     });
@@ -351,12 +382,12 @@ function PushNotification(notificationRemainderTime)
 getNotif({NotifTime:notificationRemainderTime},function(error,result){
 if(error)
 {
-    console.log("PushNotification() error: "+error);
+    utility.log("PushNotification() error: "+error,'ERROR');
     return "Error: "+error;
 }
 else
 {
-    console.log("Total Eligible getNotifications: "+result.length);
+    utility.log("Total Eligible getNotifications: "+result.length);
     for(var i=0;i<result.length;i++){
 
         var tileObj={
@@ -365,7 +396,7 @@ else
             'backBackgroundImage': "/Assets/Tiles/BackTileBackground.png",
             'backContent': result[i].Agenda,
         };
-        mpns.sendTile(result[i].PushURL,tileObj,function(){console.log('Pushed OK');});
+        mpns.sendTile(result[i].PushURL,tileObj,function(){utility.log('Pushed OK');});
     }
 }
 });
@@ -385,7 +416,7 @@ function getInvitations(response,userID,id)
  getInviteByUserID({UserID:userID,ID:id},function(error,result){
 if(error)
 {
-    console.log("GetInvitation() error: "+error);
+    utility.log("GetInvitation() error: "+error,'ERROR');
   
     var invites = {"Status":"Unsuccess"};
           response.setHeader("content-type", "text/plain");
@@ -394,7 +425,7 @@ if(error)
 }
 else
 {
-        console.log(result);
+        utility.log(result);
         //return JSON.stringify(result);
         response.setHeader("content-type", "text/plain");
          response.write("{\"invitations\":"+JSON.stringify(result)+"}");
@@ -409,7 +440,7 @@ else
     //console.log(new Date(Date.parse('2013-12-12T06:13:16.189Z')));
     var TimeFrom=new Date();
     var TimeTo=new Date(TimeFrom.getTime()+config.NOTIFICATION_DURATION);
-    console.log(TimeFrom+"-"+TimeTo);
+    utility.log(TimeFrom+"-"+TimeTo);
     var TABLE_NAME="Invitations";   
     var tableService = azure.createTableService(config.STORAGE_ACCOUNT_NAME, config.STORAGE_ACCOUNT_KEY);
     var query = azure.TableQuery
@@ -421,7 +452,7 @@ else
     tableService.queryEntities(query, function(error, entities){
     if(!error){
         //entities contains an array of entities
-        console.log(entities);
+        utility.log(entities);
         //return JSON.stringify(entities);
         response.setHeader("content-type", "text/plain");
          response.write(JSON.stringify(entities));
@@ -429,7 +460,7 @@ else
     }
     else
     {
-         console.log(error);
+         utility.log(error,'ERROR');
         invites = {"Error":error};
           response.setHeader("content-type", "text/plain");
          response.write(JSON.stringify(invites));
@@ -440,10 +471,15 @@ else
 }
 ////
 function getCreditBalance(response,userID){
+  utility.log('Getiing credit balance for '+userID);
     response.setHeader("content-type", "text/plain");
     response.write("{\"Credit\":10}");
     response.end();
+    utility.log('balance: 10');
 }
+//////////////////////////////
+
+
 /// Exposes all methods to call outsite this file, using its object   
 exports.insertUser=insertUser;
 exports.insertEmailAddress=insertEmailAddress;

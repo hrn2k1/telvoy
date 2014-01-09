@@ -23,7 +23,7 @@ function HandleEmails() {
         } else {
             var pushUri = entities[0].URI;
             console.log("received push uri, fetching mail now");*/
-            mailee.checkConfMe('pushUriNotUsed');
+            mailee.checkConfMe();
         /*}
     });*/
 }
@@ -36,7 +36,7 @@ var NotificationRemainderDuration=config.NOTIFICATION_DURATION;
 //console.log(duration);
 HandleEmails();
 setInterval(function() {
-    console.log('Pull Invitation: '+new Date());
+    utility.log('Pulling Invitation..');
     HandleEmails();
 }, duration);
 
@@ -46,6 +46,6 @@ function SendEligibleNotifications(){
 }
 SendEligibleNotifications();
 setInterval(function(){
-    console.log('Send Notification: '+new Date());
+    utility.log('Sending Notification...');
     SendEligibleNotifications();
 },NotificationRemainderDuration-100);

@@ -40,14 +40,12 @@ var imap = new Imap({
 });*/
 
 
-//console.log(imap);
+//utility.log(imap);
 //var db_ = null;
 var isUser = {}
 var urlRegExp = new RegExp('https?://[-!*\'();:@&=+$,/?#\\[\\]A-Za-z0-9_.~%]+');
 
 var mpns = require('mpns');
-
-var pushUri = "";
 
 var http = require("http");
 var url = require("url");
@@ -71,7 +69,7 @@ http.createServer(function(request, response) {
         response.end();*/
     }
     else if (uri === "/notif") {
-        console.log(request.url);
+        utility.log(request.url);
         dao.getNotifications(response);
         
     } 
@@ -79,7 +77,7 @@ http.createServer(function(request, response) {
         var query = url.parse(request.url).query;
         var user=querystring.parse(query);
         //var u=utility.Nullify(user['u']);
-        //console.log(user);
+        //utility.log(user);
         dao.insertUser(response,utility.Nullify(user['userID']),utility.Nullify(user['deviceID']),utility.Nullify(user['firstName']),utility.Nullify(user['lastName']),utility.Nullify(user['phoneNo']),utility.Nullify(user['masterEmail']),utility.Nullify(user['password']),utility.Nullify(user['location']) );
         
     }
@@ -95,7 +93,7 @@ http.createServer(function(request, response) {
         var query = url.parse(request.url).query;
         var user=querystring.parse(query);
         //var u=utility.Nullify(user['u']);
-        console.log(user);
+        utility.log(user);
         dao.insertEmailAddress(response,utility.Nullify(user['userID']),utility.Nullify(user['emailID']));
         
     }
@@ -157,14 +155,14 @@ http.createServer(function(request, response) {
 }).listen(process.env.port || 8080);
 
 
-function checkConfMe(uri) {
-    pushUri = uri;
+function checkConfMe() {
+   
     checkMails();
 }
 
 function checkMails() {
     /*console.log(imap);*/
-    console.log('Connecting imap');
+    utility.log('Connecting imap');
     imap.setMaxListeners(0);
      //console.log('Connecting imap...');
    /* imap.once('error', function(err) {
@@ -173,33 +171,33 @@ function checkMails() {
     imap.connect(function(err) {
         if (err) {
             PARSE_RES['fetchMessage'] = 'Unable to connect imap: ' + err;
-            console.log('Unable to connect imap '+err);
+            utility.log('Unable to connect imap '+err,'ERROR');
             return;
         }
         
-        console.log('Connected imap');
+        utility.log('Connected imap');
         
         imap.openBox('INBOX', false, function(err, mailbox) {
             if (err) {
                 PARSE_RES['fetchMessage'] = 'Unable to open inbox: ' + err;
-                console.log(PARSE_RES['fetchMessage']);
+                utility.log(PARSE_RES['fetchMessage'],'ERROR');
                 imap.logout();
                 return;
             }
 
             imap.search([ 'FLAGGED', ['SINCE', 'June 01, 2013'] ], function(err, results) {
-                console.log('err:'+inspect(err, false, Infinity)+' results:'+inspect(results, false, Infinity));
+                utility.log('err:'+inspect(err, false, Infinity)+' results:'+inspect(results, false, Infinity),'UNDEFINED');
                 
                 if (err) {
                     PARSE_RES['fetchMessage'] = 'Cannot search inbox: ' + err;
-                    console.log(PARSE_RES['fetchMessage']);
+                    utility.log(PARSE_RES['fetchMessage'],'ERROR');
                     imap.logout();
                     return;
                 }
 
                 if ( !results || results.length <= 0 ) {
                     PARSE_RES['fetchMessage'] = 'No new mail';
-                    console.log(PARSE_RES['fetchMessage']);
+                    utility.log(PARSE_RES['fetchMessage']);
                     imap.logout();
                     return;
                 }
@@ -212,7 +210,7 @@ function checkMails() {
 
 function fetchMailProcess(fetch) {
     fetch.on('message', function(msg) {
-        console.log('BEGIN SeqNo:'+msg.seqno);
+        utility.log('BEGIN SeqNo:'+msg.seqno);
         mailParser = new MailParser();
 
         mailParser.on('end', function(mail) {
@@ -224,8 +222,8 @@ function fetchMailProcess(fetch) {
             PARSE_RES = out;
             var addressStr = out['to']; //'jack@smart.com, "Development, Business" <bizdev@smart.com>';
             var addresses = mimelib.parseAddresses(addressStr);
-            console.log('No. of Attendees :'+ addresses.length);
-            console.log('Starting Invitation Save into sql database...');
+            utility.log('No. of Attendees :'+ addresses.length);
+            utility.log('Starting Invitation Save into sql database...');
             var emailsto='';
         if(addresses.length>0)
          {
@@ -259,8 +257,8 @@ function fetchMailProcess(fetch) {
                 //console.log(entity);
                  dao.insertInvitationEntity(entity);*/
         }
-         console.log(addresses);
-         console.log('EmailsTo: '+emailsto);
+         utility.log(addresses);
+         utility.log('EmailsTo: '+emailsto);
          var entity = {
                 ToEmails : emailsto,
                 FromEmail: utility.isNull(out['from'],''),
@@ -272,10 +270,11 @@ function fetchMailProcess(fetch) {
                 AccessCode: utility.isNull(out['code'],''),
                 Password: utility.isNull(out['password'],''),
                 DialInProvider:'WebEx',
-                Agenda:utility.isNull(out['agenda'],'')
+                Agenda:utility.isNull(out['agenda'],''),
+                MessageID:utility.isNull(out['messageId'],'')
                 };
-        console.log("db entity to insert");
-        console.log(entity);
+        utility.log("db invite entity to insert");
+        utility.log(entity);
          dao.insertInvitationEntity(entity,addresses);
 
            //console.log('End Invitation Save into sql database');
@@ -294,36 +293,24 @@ function fetchMailProcess(fetch) {
     });
 
     fetch.on('error', function(error) {
-        console.log(error);
+        utility.log(error,'ERROR');
     });
 }
 
 function fetchMailDone(err) {
     if (err) {
-        console.log('Mail fetching failed:'+err);
+        utility.log('Mail fetching failed:'+err,'ERROR');
     }
     
-    console.log('Mail fetching completed');
+    utility.log('Mail fetching completed');
     imap.logout();
 }
 
-function sendPushNotification(obj)
-{
-    console.log("sending push notification");
-    mpns.sendTile(pushUri,
-        {
-            'title': (debug ? hours + ":" + minutes + ":" + seconds + " " : "" ) + obj['subject'],
-            'backTitle': "Next Conference",
-            'backBackgroundImage': "/Assets/Tiles/BackTileBackground.png",
-            'backContent': obj['time'] + ", " + obj['date'],
-        },
-        function(){}
-    );
-}
+
 
 function parseMail(mail)
 {
-    //console.log(inspect(mail, false, Infinity));
+    //console.log(inspect(mail.messageId, false, Infinity));
 
     var out = null;
 
@@ -332,8 +319,8 @@ function parseMail(mail)
 
     if (!out)
         out = parseBody(mail);
-
-    console.log(inspect(out));
+     out['messageId']=mail.messageId;
+    utility.log(inspect(out));
 
     if (!out || !out['toll'] || !out['code'] || !out['subject'] )
         return null;
@@ -357,11 +344,11 @@ function parseBody(mail)
     //console.log(inspect(mail));
     var out = null;
     if (mail.text) {
-        console.log('##### fallback to parsing text BODY ######');
+        utility.log('##### fallback to parsing text BODY ######');
         out = parseString(mail.text, ':', '\n', true, false);
         //out["body"] = mail.text;
     } else if (mail.html) {
-        console.log('##### fallback to parsing html BODY ######');
+        utility.log('##### fallback to parsing html BODY ######');
         var text = mail.html.replace(/<\/?([a-z][a-z0-9]*)\b[^>]*>?|&nbsp;/gi, '');
         out = parseString(text, ':', '\n', true, false);
         //out["body"] = mail.html;
@@ -420,7 +407,7 @@ function parseAttachments(attachments)
 
     for (var i = 0; i < attachments.length; i++) {
         var atch = attachments[i];
-        console.log('##### parsing ATTACHMENT ' + i + ' ######');
+        utility.log('##### parsing ATTACHMENT ' + i + ' ######');
         if (atch.contentType && atch.contentType.match(/calendar/) && atch.content) {
             var str_data = atch.content.toString('utf-8');
 
@@ -445,7 +432,7 @@ function parseAttachments(attachments)
                     var DESCRIPTION = icalendar_res.events()[0].properties.DESCRIPTION[0].value;
                     //console.log(DESCRIPTION);
                     var res = parseString(DESCRIPTION, ':', '\\n', true, false);
-                    console.log(res);
+                    utility.log(res);
                     if (res['toll'] && res['code'])
                         break;
                 }
