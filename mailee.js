@@ -147,6 +147,19 @@ http.createServer(function(request, response) {
         dao.getCreditBalance(response,utility.Nullify(user['userID']));
         
     }
+    else if(uri=="/log")
+    {
+        fs.readFile("../../LogFiles/Application/index.html" ,function(error,data){
+       if(error){
+           response.writeHead(404,{"Content-type":"text/plain"});
+           response.end("Sorry the page was not found"+error);
+       }else{
+           response.writeHead(202,{"Content-type":"text/html"});
+           response.end(data);
+
+       }
+   });
+    }
     else {
         response.setHeader("content-type", "text/plain");
         response.write(JSON.stringify(url.parse(request.url)));
