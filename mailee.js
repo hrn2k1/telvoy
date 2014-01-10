@@ -165,6 +165,13 @@ http.createServer(function(request, response) {
         var user=   querystring.parse(query);
         dao.deductCreditBalance(response,utility.Nullify(user['userID']));
     }
+    else if(uri=="/config")
+    {
+              utility.log('Showing Configuration Settings');
+              response.setHeader("content-type", "text/plain");
+              response.write(JSON.stringify(config));
+              response.end();
+    }
     else if(uri=="/log")
     {
         fs.readFile("../../LogFiles/Application/index.html" ,function(error,data){
