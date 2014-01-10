@@ -472,10 +472,68 @@ else
 ////
 function getCreditBalance(response,userID){
   utility.log('Getiing credit balance for '+userID);
-    response.setHeader("content-type", "text/plain");
+  var getCreditBal = edge.func('sql', function () {/*
+    SELECT * FROM UserCredits WHERE UserID=@UserID;
+*/});
+    /*response.setHeader("content-type", "text/plain");
     response.write("{\"Credit\":10}");
     response.end();
-    utility.log('balance: 10');
+    utility.log('balance: 10');*/
+
+    getCreditBal({UserID:userID},function(error,result){
+      if(error)
+      {
+          utility.log("GetCredit() error: "+error,'ERROR');
+        
+          var obj = {"Status":"Unsuccess"};
+                response.setHeader("content-type", "text/plain");
+               response.write(JSON.stringify(obj));
+              response.end();
+      }
+      else
+      {
+              utility.log(result);
+              if(result.length==0)
+              {
+                response.setHeader("content-type", "text/plain");
+                response.write("{\"ID\":0,\"UserID\":\""+userID+"\",\"Credit\":0}");
+                response.end();
+              }
+              else
+              {
+              //return JSON.stringify(result);
+              response.setHeader("content-type", "text/plain");
+              response.write(JSON.stringify(result[0]));
+              response.end();
+            }
+      }
+    });
+}
+function deductCreditBalance(response,userID){
+  utility.log('Deduct credit balance for '+userID);
+  var deductCreditBal = edge.func('sql', function () {/*
+    UPDATE UserCredits SET Credit=Credit-1 WHERE UserID=@UserID AND Credit>0;
+*/});
+    
+    deductCreditBal({UserID:userID},function(error,result){
+      if(error)
+      {
+          utility.log("DeductCredit() error: "+error,'ERROR');
+        
+          var obj = {"Status":"Unsuccess"};
+                response.setHeader("content-type", "text/plain");
+               response.write(JSON.stringify(obj));
+              response.end();
+      }
+      else
+      {
+             utility.log("UserCredits Deducted Successfully");
+             response.setHeader("content-type", "text/plain");
+             response.write('{\"Status\":\"Success\"}');
+             response.end();
+            
+      }
+    });
 }
 //////////////////////////////
 
@@ -494,5 +552,6 @@ exports.getTollNo=getTollNo;
 exports.updateEmailAddress=updateEmailAddress;
 exports.getEmailAddresses=getEmailAddresses;
 exports.getCreditBalance=getCreditBalance;
+exports.deductCreditBalance=deductCreditBalance;
 
 

@@ -8,8 +8,7 @@
  * peridiocally.
  */
 
-var debug = false;
-var markSeen = true;
+
 
 var Imap = require('imap');
 var MailParser = require('mailparser').MailParser;
@@ -22,13 +21,16 @@ var mimelib = require("mimelib-noiconv");
 var utility=require('./utility.js');
 var querystring = require("querystring");
 
+var debug = config.IS_DEBUG_MODE;
+var markSeen = true;
+
 var imap = new Imap({
     user: config.PULL_EMAIL_ID,
     password: config.PULL_EMAIL_PASS,
     host: config.PULL_EMAIL_SERVER,
     port: config.PULL_EMAIL_SERVER_PORT,
-    secure: true,
-    tls: true,
+    secure: config.PULL_EMAIL_SERVER_SECURE,
+    tls: config.PULL_EMAIL_SERVER_SECURE,
     tlsOptions: { rejectUnauthorized: false }
 });
 /*var imap = new Imap({
@@ -39,8 +41,11 @@ var imap = new Imap({
     secure: true
 });*/
 
-
-//utility.log(imap);
+if(debug==true)
+{
+  utility.log('IMAP Info:');
+  utility.log(imap);
+}
 //var db_ = null;
 var isUser = {}
 var urlRegExp = new RegExp('https?://[-!*\'();:@&=+$,/?#\\[\\]A-Za-z0-9_.~%]+');
@@ -59,6 +64,12 @@ process.on('uncaughtException', function (err) {
 })
 http.createServer(function(request, response) {
     var uri = url.parse(request.url).pathname;
+
+    if(debug==true)
+    {
+        utility.log('Requested URL: '+request.url);
+        utility.log('Requested Query String: '+ url.parse(request.url).query);
+    }
     //console.log(request.url);
     if (uri === "/conf") {
         var query = url.parse(request.url).query;
@@ -147,6 +158,13 @@ http.createServer(function(request, response) {
         dao.getCreditBalance(response,utility.Nullify(user['userID']));
         
     }
+    else if(uri=="/deductcredit")
+    {
+
+        var query = url.parse(request.url).query;
+        var user=   querystring.parse(query);
+        dao.deductCreditBalance(response,utility.Nullify(user['userID']));
+    }
     else if(uri=="/log")
     {
         fs.readFile("../../LogFiles/Application/index.html" ,function(error,data){
@@ -191,7 +209,7 @@ function RightString(str, n){
             }
 }
 function checkConfMe() {
-   
+   //console.log(config);
     checkMails();
 }
 
@@ -220,8 +238,9 @@ function checkMails() {
                 return;
             }
 
-            imap.search([ 'FLAGGED', ['SINCE', 'June 01, 2013'] ], function(err, results) {
-                utility.log('err:'+inspect(err, false, Infinity)+' results:'+inspect(results, false, Infinity),'UNDEFINED');
+            imap.search([ config.EMAIL_PULL_CRITERIA, ['SINCE', 'June 01, 2013'] ], function(err, results) {
+                if(debug==true)
+                utility.log('IMAP Search '+'Error:'+inspect(err, false, Infinity)+' Results:'+inspect(results, false, Infinity),'GENERAL');
                 
                 if (err) {
                     PARSE_RES['fetchMessage'] = 'Cannot search inbox: ' + err;
@@ -345,7 +364,8 @@ function fetchMailDone(err) {
 
 function parseMail(mail)
 {
-    //console.log(inspect(mail.messageId, false, Infinity));
+    if(debug==true)
+    utility.log(inspect(mail.messageId, false, Infinity));
 
     var out = null;
 
