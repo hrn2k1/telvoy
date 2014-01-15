@@ -302,7 +302,7 @@ insertInvite(entity,function(error,result){
 if(error)
 {
     utility.log("insertInvitation() error: "+error,'ERROR');
-   throw error;
+   return -1;
 }
 else
 {
@@ -311,7 +311,7 @@ else
     if(error)
     {
         utility.log("insertInvitation() error: "+error,'ERROR');
-        throw error;
+        return -1;
     }
     else
     {
