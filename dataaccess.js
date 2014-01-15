@@ -374,7 +374,7 @@ else
 function PushNotification(notificationRemainderTime)
 {
     var getNotif=edge.func('sql',function(){/*
-       SELECT [Subject],Agenda,i.UserID,EmailID,Handle AS PushURL
+       SELECT [Subject],Agenda,a.UserID,EmailID,Handle AS PushURL
         FROM [dbo].[Invitations] i INNER JOIN dbo.Invitees a ON i.ID=a.InvID
         INNER JOIN telvoy.Registrations r ON 1=1  WHERE datediff(minute,GETDATE(),InvTime) between  0 and  @NotifTime
     */})
