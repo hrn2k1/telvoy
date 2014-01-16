@@ -3,6 +3,7 @@ var inspect = require('util').inspect;
 var azure = require('azure');
 var config = require('./config.js');
 var dao=require('./dataaccess.js');
+var utility=require('./utility.js');
 /*var STORAGE_ACCOUNT_NAME = "confme";
 var STORAGE_ACCOUNT_KEY = "2z+ki/6U8yUwraWWhhfZZrrKLYpQWyJxM8gVXpA3F0e8BUmgir2BCdOU15S88YeyCmioXetW0lgEL86gOqepNg==";
 var TABLE_NAME = "confmeTable";
